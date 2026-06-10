@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>싸이월드</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: black;
+      transition: background 0.8s ease;
+      font-family: 'Dotum', '돋움', 'Gulim', sans-serif;
+      font-size: 11px;
+      overflow: hidden;
+    }
+
+    body.xp {
+      background: url('image/wallpaper.jpg') center/cover no-repeat;
+    }
+
+    body.hompy-bg {
+      background: url('image/wallpaper.jpg') center/cover no-repeat;
+    }
+
+    .logo {
+      width: 50px;
+      cursor: pointer;
+    }
+
+    .desktop {
+      display: none;
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+
+    body.xp .desktop {
+      display: flex;
+    }
+
+    .icon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .icon img {
+      width: 50px;
+    }
+
+    .icon span {
+      color: white;
+      font-size: 12px;
+      font-family: 'Tahoma', sans-serif;
+      text-shadow: 1px 1px 2px black;
+    }
+
+    .taskbar {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 36px;
+      background: linear-gradient(180deg, #d4d0c8 0%, #c0bdb5 50%, #a8a49c 100%);
+      border-top: 2px solid #ffffff;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 6px;
+      z-index: 999;
+    }
+
+    body.xp .taskbar {
+      display: flex;
+    }
+
+    .start-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: linear-gradient(180deg, #e0ddd5 0%, #c0bdb5 100%);
+      border: 1px solid #ffffff;
+      border-right-color: #808080;
+      border-bottom-color: #808080;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-family: 'Tahoma', sans-serif;
+      font-weight: bold;
+      cursor: pointer;
+      height: 24px;
+    }
+
+    .start-btn img {
+      width: 16px;
+      height: 16px;
+    }
+
+    .clock {
+      background: linear-gradient(180deg, #a8a49c 0%, #c0bdb5 100%);
+      border: 1px solid #808080;
+      border-right-color: #ffffff;
+      border-bottom-color: #ffffff;
+      padding: 2px 6px;
+      font-size: 11px;
+      font-family: 'Tahoma', sans-serif;
+      height: 24px;
+      display: flex;
+      align-items: center;
+    }
+
+    .toast {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, #3366cc, #1144aa);
+      color: white;
+      padding: 7px 18px;
+      font-size: 11px;
+      border: 1px solid #6699ff;
+      border-radius: 3px;
+      z-index: 9999;
+      display: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 80, 0.4);
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    .cy-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .cy-overlay.visible {
+      display: flex;
+    }
+
+    .cy-notebook {
+      background: #4db8e8;
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 4px 24px rgba(0, 80, 140, 0.5);
+    }
+
+    .cy-page {
+      background: white;
+      border-radius: 10px;
+      width: 560px;
+      min-height: 420px;
+      border: 2px dashed #90cce8;
+      position: relative;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 44px 70px;
+    }
+
+    .cy-page.active {
+      display: flex;
+    }
+
+    .cy-page::before {
+      content: '';
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 36px;
+      height: 12px;
+      background: #4db8e8;
+      border-radius: 0 0 8px 8px;
+    }
+
+    .cy-page::after {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 36px;
+      height: 12px;
+      background: #4db8e8;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .cy-logo-txt {
+      font-size: 38px;
+      font-weight: 900;
+      font-family: 'Arial Black', sans-serif;
+      letter-spacing: -2px;
+      background: linear-gradient(135deg, #ff6600, #ffcc00, #00cc44, #0066ff, #cc00cc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .cy-input {
+      width: 100%;
+      background: #f4f6f8;
+      border: none;
+      border-radius: 12px;
+      padding: 15px 18px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .cy-input:focus {
+      background: #eef0f3;
+    }
+
+    .cy-btn-main {
+      width: 100%;
+      background: linear-gradient(135deg, #ff7a00, #ff5500);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 15px;
+      font-weight: bold;
+      font-family: inherit;
+      cursor: pointer;
+      letter-spacing: 1px;
+    }
+
+    .cy-btn-main:hover {
+      opacity: 0.9;
+    }
+
+    /* ===== 홈피 전체화면 ===== */
+    #hompy-full {
+      display: none;
+      position: fixed;
+      inset: 0;
+      flex-direction: column;
+      z-index: 500;
+      overflow: hidden;
+    }
+
+    #hompy-full.visible {
+      display: flex;
+    }
+
+    .btn {
+      background: linear-gradient(180deg, #eef4ff, #d0e0f8);
+      border: 1px solid #7799cc;
+      padding: 3px 12px;
+      font-size: 11px;
+      font-family: 'Dotum', sans-serif;
+      cursor: pointer;
+      border-radius: 2px;
+      color: #224488;
+    }
+
+    .btn:hover {
+      background: linear-gradient(180deg, #ffffff, #ddeeff);
+    }
+
+    .btn-blue {
+      background: linear-gradient(180deg, #3366cc, #1144aa);
+      color: white;
+      border-color: #2255bb;
+    }
+
+    .btn-blue:hover {
+      background: linear-gradient(180deg, #4477dd, #2255bb);
+    }
+
+    .btn-red {
+      background: linear-gradient(180deg, #ee4444, #cc2222);
+      color: white;
+      border-color: #bb1111;
+    }
+
+    .sm {
+      padding: 2px 8px;
+      font-size: 10px;
+    }
+
+    .tlink {
+      color: #0055cc;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .tlink:hover {
+      color: #ff4400;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #4477cc;
+    }
+
+    .frow {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+      gap: 5px;
+    }
+
+    .frow label {
+      width: 58px;
+      font-size: 11px;
+      color: #336;
+      flex-shrink: 0;
+    }
+
+    .frow input,
+    .frow textarea {
+      flex: 1;
+      border: 1px solid #99aacc;
+      padding: 2px 4px;
+      font-size: 11px;
+      font-family: 'Dotum', sans-serif;
+      background: white;
+      border-radius: 1px;
+    }
+
+    .frow textarea {
+      height: 55px;
+      resize: none;
+    }
+
+    .fbox {
+      border: 1px solid #99aacc;
+      padding: 10px;
+      margin: 7px 0;
+      background: linear-gradient(180deg, #f5f8ff, #eaf0ff);
+      border-radius: 3px;
+    }
+
+    .fbox h3 {
+      font-size: 12px;
+      color: #1144aa;
+      border-bottom: 1px solid #bbccee;
+      padding-bottom: 4px;
+      margin-bottom: 7px;
+    }
+
+    .bgmbar {
+      background: linear-gradient(90deg, #0a1a3a, #0d2050);
+      color: #66aaff;
+      padding: 3px 10px;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-top: 1px solid #224488;
+      border-bottom: 1px solid #224488;
+      flex-shrink: 0;
+    }
+
+    .bgmt {
+      flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .bgmc {
+      cursor: pointer;
+      color: #ffcc00;
+      font-size: 12px;
+    }
+
+    .cy-header {
+      background: linear-gradient(180deg, #4488ee 0%, #2266cc 40%, #1155bb 100%);
+      padding: 0;
+      border-bottom: 2px solid #0d44aa;
+      flex-shrink: 0;
+    }
+
+    .cy-header-top {
+      padding: 5px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cy-logo-sm {
+      color: #ffee00;
+      font-size: 16px;
+      font-weight: 900;
+      font-family: 'Arial Black', sans-serif;
+      letter-spacing: -1px;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+    }
+
+    .cy-logo-sm span {
+      color: white;
+    }
+
+    .cy-nav {
+      display: flex;
+      gap: 1px;
+    }
+
+    .cy-nav a {
+      color: #cce4ff;
+      font-size: 10px;
+      cursor: pointer;
+      padding: 2px 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+    }
+
+    .cy-nav a:hover {
+      background: rgba(255, 255, 255, 0.25);
+      color: white;
+    }
+
+    .cy-visitbar {
+      background: linear-gradient(90deg, #e8f0ff, #d5e4ff);
+      padding: 3px 10px;
+      border-bottom: 1px solid #aabcdd;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      color: #336;
+    }
+
+    .vcount {
+      background: #001a33;
+      color: #00ff88;
+      padding: 1px 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      border: 1px solid #00aa44;
+      letter-spacing: 2px;
+      border-radius: 1px;
+    }
+
+    .cy-ownertxt {
+      margin-left: auto;
+      color: #446;
+      font-size: 10px;
+      font-weight: bold;
+    }
+
+    .cy-layout {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .cy-left {
+      background: linear-gradient(180deg, #e0ecff 0%, #ccdaf8 100%);
+      border-right: 1px solid #99bbdd;
+      padding: 7px 5px;
+      overflow-y: auto;
+    }
+
+    .mmbox {
+      background: linear-gradient(180deg, #a8d8ea, #7ab8d8);
+      border: 2px solid #5588aa;
+      border-radius: 5px;
+      padding: 3px;
+      margin-bottom: 5px;
+      cursor: pointer;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mmbox::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.15), transparent);
+      pointer-events: none;
+    }
+
+    .mmbox:hover {
+      border-color: #ff8800;
+      box-shadow: 0 0 8px rgba(255, 136, 0, 0.3);
+    }
+
+    .cy-pname {
+      text-align: center;
+      font-size: 12px;
+      font-weight: bold;
+      color: #003080;
+      margin-bottom: 1px;
+    }
+
+    .cy-pid {
+      text-align: center;
+      font-size: 10px;
+      color: #6677aa;
+      margin-bottom: 5px;
+    }
+
+    .ddaybox {
+      background: linear-gradient(135deg, #fff0f0, #ffd8e0);
+      border: 1px solid #ffaacc;
+      padding: 3px 5px;
+      text-align: center;
+      margin-bottom: 5px;
+      border-radius: 3px;
+    }
+
+    .ddaynum {
+      font-size: 16px;
+      font-weight: bold;
+      color: #cc0044;
+      line-height: 1.1;
+    }
+
+    .ddaylabel {
+      font-size: 9px;
+      color: #cc6688;
+    }
+
+    .lnav {
+      list-style: none;
+      margin-bottom: 5px;
+      border: 1px solid #99bbdd;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .lnav li {
+      border-bottom: 1px solid #bbccee;
+    }
+
+    .lnav li:last-child {
+      border-bottom: none;
+    }
+
+    .lnav li a {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 7px;
+      font-size: 11px;
+      color: #224488;
+      cursor: pointer;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.7), rgba(220, 235, 255, 0.5));
+    }
+
+    .lnav li a:hover {
+      background: linear-gradient(90deg, #3366cc, #5588ee);
+      color: white;
+    }
+
+    .lnav li a.on {
+      background: linear-gradient(90deg, #1144aa, #3366cc);
+      color: white;
+      font-weight: bold;
+    }
+
+    .bgmmini {
+      background: linear-gradient(90deg, #001a33, #002244);
+      color: #00aaff;
+      padding: 3px 5px;
+      font-size: 9px;
+      border: 1px solid #224488;
+      border-radius: 2px;
+      text-align: center;
+      cursor: pointer;
+      margin-top: 3px;
+    }
+
+    .bgmmini:hover {
+      background: linear-gradient(90deg, #002244, #003366);
+    }
+
+    .lbtns {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 5px;
+    }
+
+    .lbtns button {
+      width: 100%;
+      font-size: 10px;
+      padding: 3px 4px;
+    }
+
+    .cy-right {
+      background: white;
+      padding: 8px;
+      overflow-y: auto;
+    }
+
+    .sectitle {
+      font-size: 13px;
+      font-weight: bold;
+      color: #1144aa;
+      border-bottom: 2px solid #3366cc;
+      padding-bottom: 4px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .profile-head {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+      align-items: flex-start;
+    }
+
+    .avt {
+      width: 60px;
+      height: 60px;
+      border: 2px solid #6699cc;
+      background: linear-gradient(135deg, #c8ddf8, #a8c8f0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      overflow: hidden;
+      flex-shrink: 0;
+      border-radius: 3px;
+    }
+
+    .avt img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .biobox {
+      background: linear-gradient(135deg, #fffef0, #fff8e0);
+      border: 1px solid #ddeebb;
+      padding: 5px 7px;
+      font-size: 11px;
+      color: #444;
+      line-height: 1.5;
+      border-radius: 3px;
+      margin-top: 3px;
+    }
+
+    .recentbox {
+      background: linear-gradient(135deg, #f8f8ff, #f0f4ff);
+      border: 1px solid #ccddee;
+      padding: 5px 7px;
+      margin-bottom: 5px;
+      border-radius: 3px;
+    }
+
+    .rtitle {
+      font-size: 11px;
+      font-weight: bold;
+      color: #3355aa;
+      margin-bottom: 3px;
+    }
+
+    .ritem {
+      font-size: 11px;
+      color: #333;
+      padding: 2px 0;
+      border-bottom: 1px dashed #dde;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .ritem:hover {
+      color: #1144aa;
+      background: #f0f4ff;
+    }
+
+    .rdate {
+      color: #99aacc;
+      font-size: 10px;
+    }
+
+    .dentry {
+      border-bottom: 1px solid #e0e8f8;
+      padding: 7px 0;
+      cursor: pointer;
+    }
+
+    .dentry:hover {
+      background: #f4f8ff;
+    }
+
+    .dtitle {
+      font-size: 12px;
+      font-weight: bold;
+      color: #1144aa;
+      margin-bottom: 2px;
+    }
+
+    .dmeta {
+      font-size: 10px;
+      color: #8899bb;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .dpri {
+      background: #ffcc00;
+      color: #333;
+      padding: 0 3px;
+      font-size: 9px;
+      font-weight: bold;
+      border-radius: 2px;
+    }
+
+    .dcontent {
+      font-size: 11px;
+      color: #444;
+      margin-top: 5px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      padding: 6px;
+      background: #f8faff;
+      border: 1px solid #ddeeff;
+      border-radius: 2px;
+      display: none;
+    }
+
+    .wform {
+      background: linear-gradient(135deg, #f5f8ff, #eaf0ff);
+      border: 1px solid #aabbdd;
+      padding: 8px;
+      margin-bottom: 8px;
+      border-radius: 3px;
+    }
+
+    .wform input[type="text"] {
+      width: 100%;
+      border: 1px solid #99aacc;
+      padding: 3px 4px;
+      font-size: 11px;
+      font-family: 'Dotum', sans-serif;
+      margin-bottom: 4px;
+      box-sizing: border-box;
+      border-radius: 1px;
+    }
+
+    .wform textarea {
+      width: 100%;
+      height: 70px;
+      border: 1px solid #99aacc;
+      font-size: 11px;
+      font-family: 'Dotum', sans-serif;
+      resize: vertical;
+      padding: 3px;
+      margin-bottom: 4px;
+      box-sizing: border-box;
+      border-radius: 1px;
+    }
+
+    .cbrow {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 5px;
+      font-size: 11px;
+    }
+
+    .pgrid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+    }
+
+    .pitem {
+      aspect-ratio: 1;
+      background: linear-gradient(135deg, #d8e8f8, #c8d8ee);
+      border: 1px solid #99aacc;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      border-radius: 2px;
+    }
+
+    .pitem img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .povl {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 20, 80, 0.6);
+      color: white;
+      font-size: 10px;
+      align-items: flex-end;
+      padding: 5px;
+    }
+
+    .pitem:hover .povl {
+      display: flex;
+    }
+
+    .gbentry {
+      border-bottom: 1px dashed #ccddf0;
+      padding: 6px 0;
+    }
+
+    .gbentry:last-child {
+      border-bottom: none;
+    }
+
+    .gbhead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2px;
+    }
+
+    .gbauthor {
+      font-weight: bold;
+      font-size: 11px;
+      color: #2255cc;
+      cursor: pointer;
+    }
+
+    .gbauthor:hover {
+      color: #ff4400;
+    }
+
+    .gbdate {
+      font-size: 10px;
+      color: #99aacc;
+    }
+
+    .gbcont {
+      font-size: 11px;
+      color: #333;
+      line-height: 1.4;
+    }
+
+    .gbdel {
+      font-size: 10px;
+      color: #cc0000;
+      cursor: pointer;
+      margin-left: 4px;
+    }
+
+    .gbdel:hover {
+      text-decoration: underline;
+    }
+
+    .gbwrite {
+      background: linear-gradient(135deg, #f5f8ff, #eaf0ff);
+      border: 1px solid #aabbdd;
+      padding: 7px;
+      margin-bottom: 8px;
+      border-radius: 3px;
+    }
+
+    .gbwrite textarea {
+      width: 100%;
+      height: 44px;
+      border: 1px solid #99aacc;
+      font-size: 11px;
+      font-family: 'Dotum', sans-serif;
+      resize: none;
+      padding: 3px;
+      box-sizing: border-box;
+      border-radius: 1px;
+    }
+
+    .fsbox {
+      background: linear-gradient(135deg, #fffbec, #fff8d8);
+      border: 1px solid #ddcc77;
+      padding: 7px;
+      margin-bottom: 7px;
+      border-radius: 3px;
+    }
+
+    .fstitle {
+      font-size: 11px;
+      font-weight: bold;
+      color: #886600;
+      margin-bottom: 5px;
+    }
+
+    .fsrow {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 5px;
+    }
+
+    .fsrow input {
+      flex: 1;
+      border: 1px solid #99aacc;
+      padding: 2px 5px;
+      font-size: 11px;
+      font-family: 'Dotum', sans-serif;
+      border-radius: 1px;
+    }
+
+    .fsresitem {
+      padding: 4px 6px;
+      cursor: pointer;
+      border: 1px solid #ddd088;
+      margin-bottom: 2px;
+      background: white;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      border-radius: 2px;
+    }
+
+    .fsresitem:hover {
+      background: #fffae0;
+    }
+
+    .fslabelform {
+      background: #fffae0;
+      border: 1px solid #ddcc77;
+      padding: 7px;
+      margin-top: 5px;
+      border-radius: 3px;
+    }
+
+    .fgrid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .fcard {
+      background: linear-gradient(135deg, #f0f4ff, #e4f0ff);
+      border: 1px solid #aabbdd;
+      padding: 5px;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+
+    .fcard:hover {
+      background: linear-gradient(135deg, #ddeeff, #c8d8f8);
+      border-color: #8899cc;
+    }
+
+    .favt {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #c8ddf8, #a8c8f0);
+      border: 1px solid #6699cc;
+      margin: 0 auto 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      overflow: hidden;
+      border-radius: 2px;
+    }
+
+    .favt img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .fname {
+      font-size: 10px;
+      color: #1144aa;
+      font-weight: bold;
+    }
+
+    .flabel {
+      font-size: 9px;
+      color: #6677aa;
+    }
+
+    .freq {
+      background: linear-gradient(135deg, #fffbec, #fff8d8);
+      border: 1px solid #ddcc77;
+      padding: 5px 7px;
+      margin-bottom: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 2px;
+    }
+
+    .mmeditor {
+      padding: 6px;
+    }
+
+    .mmprev {
+      width: 110px;
+      height: 130px;
+      background: linear-gradient(180deg, #a8d8ea, #87ceeb);
+      border: 2px solid #5588aa;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+    }
+
+    .optgrp {
+      margin-bottom: 8px;
+    }
+
+    .optgrp label {
+      display: block;
+      font-size: 11px;
+      font-weight: bold;
+      color: #1144aa;
+      margin-bottom: 3px;
+    }
+
+    .optrow {
+      display: flex;
+      gap: 3px;
+      flex-wrap: wrap;
+    }
+
+    .obtn {
+      background: linear-gradient(180deg, #eef4ff, #d8e8ff);
+      border: 1px solid #99aacc;
+      padding: 2px 7px;
+      font-size: 10px;
+      cursor: pointer;
+      border-radius: 2px;
+      color: #224488;
+    }
+
+    .obtn:hover {
+      background: linear-gradient(180deg, #ffffff, #e8f0ff);
+    }
+
+    .obtn.on {
+      background: linear-gradient(180deg, #3366cc, #1144aa);
+      color: white;
+      border-color: #2255bb;
+    }
+
+    .cbtn {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #99aacc;
+      cursor: pointer;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .cbtn:hover {
+      border-color: #224488;
+    }
+
+    .cbtn.on {
+      border-color: #000080;
+      border-width: 3px;
+    }
+
+    .editform {
+      background: linear-gradient(135deg, #f5f8ff, #eaf0ff);
+      border: 1px solid #aabbdd;
+      padding: 8px;
+      border-radius: 3px;
+    }
+
+    .swrap {
+      padding: 10px;
+    }
+
+    .srow {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    .srow input {
+      flex: 1;
+      border: 1px solid #99aacc;
+      padding: 3px 5px;
+      font-size: 11px;
+      font-family: 'Dotum', sans-serif;
+      border-radius: 1px;
+    }
+
+    .sres {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 0;
+      border-bottom: 1px solid #dde8f8;
+      cursor: pointer;
+    }
+
+    .sres:hover {
+      background: #f0f6ff;
+      padding-left: 4px;
+    }
+
+    .savt {
+      width: 30px;
+      height: 30px;
+      background: linear-gradient(135deg, #c8ddf8, #a8c8f0);
+      border: 1px solid #6699cc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+      overflow: hidden;
+      border-radius: 2px;
+    }
+
+    .savt img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #d8e8f8;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #6699cc, #4477aa);
+      border-radius: 3px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="toast" id="toast"></div>
+
+  <img class="logo" src="image/on.png" alt="로고" onclick="document.body.classList.add('xp'); this.style.display='none'">
+
+  <div class="desktop">
+    <div class="icon">
+      <img src="image/trash.png" alt="휴지통">
+      <span>휴지통</span>
+    </div>
+    <div class="icon" ondblclick="openCy()">
+      <img src="image/icon.png" alt="cyworld">
+      <span>cyworld</span>
+    </div>
+    <div class="icon">
+      <img src="image/internet.png" alt="internet">
+      <span>internet</span>
+    </div>
+    <div class="icon">
+      <img src="image/memo.png" alt="메모장">
+      <span>메모장</span>
+    </div>
+  </div>
+
+  <div class="taskbar">
+    <button class="start-btn">
+      <img src="image/window.png" alt="시작"> 시작
+    </button>
+    <div class="clock" id="clock"></div>
+  </div>
+
+  <!-- 로그인/회원가입 오버레이 -->
+  <div class="cy-overlay" id="cyOverlay">
+    <div class="cy-notebook">
+      <div class="cy-page active" id="login-page">
+        <div style="text-align:center;margin-bottom:32px;">
+          <div class="icon">
+            <img src="image/cyworldlogin.png" alt="cyworldlogins" style="width: 200px;">
+          </div>
+        </div>
+        <div style="width:100%;">
+          <input class="cy-input" id="lid" type="text" placeholder="아이디" onkeydown="if(event.key==='Enter')doLogin()">
+          <input class="cy-input" id="lpw" type="password" placeholder="비밀번호"
+            onkeydown="if(event.key==='Enter')doLogin()">
+          <button class="cy-btn-main" onclick="doLogin()">로그인</button>
+        </div>
+        <div style="margin-top:20px;font-size:12px;color:#888;">
+          아직 회원이 아니신가요? <span onclick="showSignup()" style="color:#ff6600;font-weight:bold;cursor:pointer;">회원가입</span>
+        </div>
+      </div>
+      <div class="cy-page" id="signup-page">
+        <div style="text-align:center;margin-bottom:28px;">
+          <div class="cy-logo-txt">Cyworld</div>
+          <div style="font-size:11px;color:#aabbcc;margin-top:5px;letter-spacing:0.5px;">회원가입</div>
+        </div>
+        <div style="width:100%;">
+          <input class="cy-input" id="suid" type="text" placeholder="아이디 (영문+숫자)">
+          <input class="cy-input" id="sunick" type="text" placeholder="닉네임">
+          <input class="cy-input" id="supw" type="password" placeholder="비밀번호 (6자 이상)">
+          <button class="cy-btn-main" onclick="doSignup()">가입하기</button>
+        </div>
+        <div style="margin-top:20px;font-size:12px;color:#888;">
+          이미 회원이신가요? <span onclick="showLogin()" style="color:#ff6600;font-weight:bold;cursor:pointer;">로그인 →</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 홈피 전체화면 -->
+  <div id="hompy-full">
+    <div class="cy-header">
+      <div class="cy-header-top">
+        <div class="cy-logo-sm">Cy<span>world</span></div>
+        <div class="cy-nav">
+          <a onclick="goMyHompy()">내홈피</a>
+          <a onclick="openSearch()">친구찾기</a>
+          <a onclick="doLogout()">로그아웃</a>
+        </div>
+      </div>
+      <div class="cy-visitbar">
+        <span>TODAY</span><span class="vcount" id="vtoday">001</span>
+        <span>TOTAL</span><span class="vcount" id="vtotal">000000</span>
+        <span class="cy-ownertxt" id="howner"></span>
+      </div>
+    </div>
+    <div class="bgmbar" id="bgmbar" style="display:none">
+      <span>♪</span><span class="bgmt" id="bgmt">BGM</span><span class="bgmc" onclick="toggleBgm()">▶</span>
+    </div>
+    <div class="cy-layout" style="flex:1;min-height:0;">
+      <div class="cy-left">
+        <div class="mmbox" id="mmbox" onclick="goMMEdit()">
+          <svg id="mmsvg" viewBox="0 0 70 100" width="116" height="90" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="35" cy="97" rx="14" ry="3" fill="rgba(0,0,0,0.1)" />
+            <ellipse cx="35" cy="68" rx="18" ry="22" fill="#4499ff" id="mmb" />
+            <rect x="30" y="44" width="10" height="8" fill="#ffe0b0" />
+            <ellipse cx="14" cy="62" rx="6" ry="10" fill="#4499ff" id="mmarm-l" transform="rotate(-15,14,62)" />
+            <ellipse cx="56" cy="62" rx="6" ry="10" fill="#4499ff" id="mmarm-r" transform="rotate(15,56,62)" />
+            <circle cx="11" cy="72" r="4.5" fill="#ffe0b0" />
+            <circle cx="59" cy="72" r="4.5" fill="#ffe0b0" />
+            <ellipse cx="27" cy="88" rx="6" ry="9" fill="#4499ff" id="mmleg-l" />
+            <ellipse cx="43" cy="88" rx="6" ry="9" fill="#4499ff" id="mmleg-r" />
+            <ellipse cx="26" cy="95" rx="7" ry="4" fill="#333" />
+            <ellipse cx="44" cy="95" rx="7" ry="4" fill="#333" />
+            <circle cx="35" cy="30" r="18" fill="#ffe0b0" id="mmface" />
+            <circle cx="24" cy="34" r="4" fill="#ffb8b8" opacity="0.6" />
+            <circle cx="46" cy="34" r="4" fill="#ffb8b8" opacity="0.6" />
+            <ellipse cx="28" cy="29" rx="3.5" ry="4" fill="white" />
+            <ellipse cx="42" cy="29" rx="3.5" ry="4" fill="white" />
+            <circle cx="29" cy="30" r="2" fill="#333" />
+            <circle cx="43" cy="30" r="2" fill="#333" />
+            <circle cx="30" cy="29" r="0.7" fill="white" />
+            <circle cx="44" cy="29" r="0.7" fill="white" />
+            <path d="M29 37 Q35 42 41 37" stroke="#c07050" stroke-width="1.8" fill="none" stroke-linecap="round"
+              id="mmm" />
+            <ellipse cx="35" cy="16" rx="18" ry="10" fill="#5533cc" id="mmh" />
+            <ellipse cx="35" cy="20" rx="18" ry="8" fill="#5533cc" id="mmh2" />
+          </svg>
+        </div>
+        <div class="cy-pname" id="sbname">닉네임</div>
+        <div class="cy-pid" id="sbid">@아이디</div>
+        <div id="ddaybox" class="ddaybox" style="display:none">
+          <div class="ddaylabel">💕 우리 만난지</div>
+          <div class="ddaynum" id="ddaynum">D+0</div>
+        </div>
+        <ul class="lnav">
+          <li><a id="nav-home" class="on" onclick="showSec('home')">🏠 홈</a></li>
+          <li><a id="nav-diary" onclick="showSec('diary')">📓 다이어리</a></li>
+          <li><a id="nav-photos" onclick="showSec('photos')">📷 사진첩</a></li>
+          <li><a id="nav-gb" onclick="showSec('gb')">📝 방명록</a></li>
+          <li><a id="nav-friends" onclick="showSec('friends')">👥 일촌</a></li>
+        </ul>
+        <div class="bgmmini" onclick="toggleBgm()">♪ BGM</div>
+        <div class="lbtns">
+          <button id="btnfriend" class="btn sm" style="display:none" onclick="showSec('friends')">💌 일촌신청</button>
+          <button id="btnedit" class="btn sm" style="display:none" onclick="showSec('edit')">✏️ 꾸미기</button>
+          <button id="btnlogout" class="btn btn-red sm" style="display:none" onclick="doLogout()">🚪 로그아웃</button>
+        </div>
+      </div>
+      <div class="cy-right" id="hright"></div>
+    </div>
+    <div id="search-page" style="display:none;position:absolute;inset:0;background:white;z-index:10;overflow-y:auto;">
+      <div class="swrap">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <button class="btn sm" onclick="closeSearch()">← 뒤로</button>
+          <span style="font-size:13px;font-weight:bold;color:#1144aa;">🔍 친구 찾기</span>
+        </div>
+        <div class="srow">
+          <input id="sq" placeholder="아이디 또는 닉네임 검색" onkeydown="if(event.key==='Enter')doSearch()">
+          <button class="btn btn-blue" onclick="doSearch()">검색</button>
+        </div>
+        <div id="sresults"></div>
+      </div>
+    </div>
+  </div>
+
+  <audio id="bgmaudio" loop></audio>
+
+  <script>
+    const CONFIG = { API_BASE: "https://cyworld-production.up.railway.app" };
+    const API = CONFIG.API_BASE;
+    let cU = null, cT = null, cUN = "", cP = null, cMM = null, isOwner = false, selFriend_un = "", visitUN = "";
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById("clock").textContent =
+        String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
+    }
+    updateClock(); setInterval(updateClock, 1000);
+
+    function toast(msg, ms = 2500) {
+      const t = document.getElementById("toast");
+      t.textContent = msg; t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), ms);
+    }
+
+    function openCy() {
+      document.getElementById("cyOverlay").classList.add("visible");
+      showLogin();
+    }
+
+    function showLogin() {
+      document.getElementById("login-page").classList.add("active");
+      document.getElementById("signup-page").classList.remove("active");
+    }
+    function showSignup() {
+      document.getElementById("signup-page").classList.add("active");
+      document.getElementById("login-page").classList.remove("active");
+    }
+
+    function enterHompy() {
+      document.getElementById("cyOverlay").classList.remove("visible");
+      document.getElementById("hompy-full").classList.add("visible");
+      document.body.classList.remove("xp");
+      document.body.classList.add("hompy-bg");
+    }
+
+    function doLogout() {
+      cU = null; cT = null; cP = null; cUN = ""; visitUN = "";
+      localStorage.removeItem("cy_t"); localStorage.removeItem("cy_u"); localStorage.removeItem("cy_p");
+      document.getElementById("hompy-full").classList.remove("visible");
+      document.body.classList.remove("hompy-bg");
+      document.body.classList.add("xp");
+      toast("로그아웃 되었습니다");
+    }
+
+    function loadSess() {
+      const t = localStorage.getItem("cy_t"), u = localStorage.getItem("cy_u");
+      if (t && u) { cT = t; cU = JSON.parse(u); const p = localStorage.getItem("cy_p"); if (p) { const sp = JSON.parse(p); cUN = sp?.username || ""; } }
+    }
+
+    async function doLogin() {
+      const username = document.getElementById("lid").value.trim();
+      const pw = document.getElementById("lpw").value;
+      if (!username || !pw) { toast("아이디와 비밀번호를 입력해 주세요"); return; }
+      try {
+        const r = await fetch(`${API}/api/auth/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, password: pw }) });
+        const d = await r.json();
+        if (!r.ok) { toast(d.detail || "로그인 실패"); return; }
+        cT = d.access_token; cU = { id: d.user_id }; cUN = d.profile.username;
+        localStorage.setItem("cy_t", cT); localStorage.setItem("cy_u", JSON.stringify(cU)); localStorage.setItem("cy_p", JSON.stringify(d.profile));
+        toast("로그인 성공! 환영합니다 🎉");
+        enterHompy();
+        showHompy(cUN);
+      } catch (e) { toast("서버 연결 오류"); }
+    }
+
+    async function doSignup() {
+      const username = document.getElementById("suid").value.trim();
+      const nickname = document.getElementById("sunick").value.trim();
+      const pw = document.getElementById("supw").value;
+      if (!username || !nickname || !pw) { toast("모든 항목을 입력해 주세요"); return; }
+      if (!/^[a-zA-Z0-9_]+$/.test(username)) { toast("아이디는 영문, 숫자, 밑줄만 가능합니다"); return; }
+      if (pw.length < 6) { toast("비밀번호는 6자 이상이어야 합니다"); return; }
+      try {
+        const r = await fetch(`${API}/api/auth/signup`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, nickname, password: pw }) });
+        const d = await r.json();
+        if (!r.ok) { toast(d.detail || "가입 실패"); return; }
+        toast("가입 완료! 로그인해 주세요 🎊"); showLogin();
+      } catch (e) { toast("서버 연결 오류"); }
+    }
+
+    function goMyHompy() { if (cUN) showHompy(cUN); }
+    function openSearch() { document.getElementById("search-page").style.display = "block"; }
+    function closeSearch() { document.getElementById("search-page").style.display = "none"; }
+
+    async function showHompy(username) {
+      if (!username) return;
+      visitUN = username;
+      document.getElementById("hright").innerHTML = '<div class="loading">⏳ 로딩 중...</div>';
+      try {
+        const headers = cT ? { "Authorization": `Bearer ${cT}` } : {};
+        const r = await fetch(`${API}/api/profiles/${username}`, { headers });
+        if (!r.ok) { toast("존재하지 않는 미니홈피입니다"); return; }
+        cP = await r.json(); isOwner = cU && cU.id === cP.id;
+        const mr = await fetch(`${API}/api/minime/${cP.id}`);
+        if (mr.ok) cMM = await mr.json();
+        renderHUI(cP); showSec("home");
+      } catch (e) { document.getElementById("hright").innerHTML = '<div class="loading">서버 연결 오류</div>'; }
+    }
+
+    function renderHUI(p) {
+      document.getElementById("sbname").textContent = p.nickname;
+      document.getElementById("sbid").textContent = `@${p.username}`;
+      document.getElementById("howner").textContent = `${p.nickname}의 미니홈피`;
+      document.getElementById("vtotal").textContent = String(p.visit_count || 0).padStart(6, "0");
+      if (p.couple_date) { const days = Math.floor((new Date() - new Date(p.couple_date)) / (1000 * 60 * 60 * 24)) + 1; document.getElementById("ddaybox").style.display = "block"; document.getElementById("ddaynum").textContent = `D+${days}`; }
+      else document.getElementById("ddaybox").style.display = "none";
+      if (p.bg_music) { document.getElementById("bgmbar").style.display = "flex"; document.getElementById("bgmt").textContent = p.bg_music; }
+      else document.getElementById("bgmbar").style.display = "none";
+      document.getElementById("btnedit").style.display = isOwner ? "block" : "none";
+      document.getElementById("btnlogout").style.display = isOwner ? "block" : "none";
+      document.getElementById("btnfriend").style.display = (!isOwner && cU) ? "block" : "none";
+      renderMM(cMM);
+    }
+
+    const MO = { casual: "#4499ff", formal: "#334466", sporty: "#ff6633", cute: "#ff88cc", school: "#3355aa", hanbok: "#cc4488", summer: "#ff9944", winter: "#6699cc" };
+    const MH = { short: "#5533cc", long: "#cc3355", curl: "#884400", bun: "#884400", bob: "#222222", none: "transparent" };
+    const MF = { smile: "M30 34 Q35 38 40 34", sad: "M30 35 Q35 31 40 35", neutral: "M30 34 L40 34", wink: "M30 34 Q35 38 40 34", angry: "M30 33 Q35 30 40 33", surprised: "M32 34 Q35 40 38 34", happy: "M28 34 Q35 42 42 34", shy: "M31 35 Q35 38 39 35" };
+
+    function applyHairStyle(s, hair, hc, prefix) {
+      s.querySelectorAll(".dhair").forEach(el => el.remove());
+      const h1 = s.querySelector(`#${prefix}h`), h2 = s.querySelector(`#${prefix}h2`);
+      if (!h1) return;
+      if (hair === "none") { h1.setAttribute("fill", "transparent"); if (h2) h2.setAttribute("fill", "transparent"); }
+      else if (hair === "short" || hair === "long") { h1.setAttribute("rx", "18"); h1.setAttribute("ry", "10"); h1.setAttribute("cy", "16"); if (h2) { h2.setAttribute("rx", "18"); h2.setAttribute("ry", "8"); h2.setAttribute("cy", "20"); } h1.setAttribute("fill", hc); if (h2) h2.setAttribute("fill", hc); if (hair === "long") { const g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.setAttribute("class", "dhair"); g.innerHTML = `<ellipse cx="17" cy="35" rx="5" ry="14" fill="${hc}"/><ellipse cx="53" cy="35" rx="5" ry="14" fill="${hc}"/>`; s.insertBefore(g, s.querySelector("#mmface") || s.querySelector("circle")); } }
+      else if (hair === "curl") { h1.setAttribute("fill", hc); if (h2) h2.setAttribute("fill", hc); const g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.setAttribute("class", "dhair"); g.innerHTML = `<ellipse cx="17" cy="30" rx="5" ry="10" fill="${hc}"/><ellipse cx="53" cy="30" rx="5" ry="10" fill="${hc}"/><circle cx="17" cy="40" r="5" fill="${hc}"/><circle cx="53" cy="40" r="5" fill="${hc}"/>`; s.insertBefore(g, s.querySelector("#mmface") || s.querySelector("circle")); }
+      else if (hair === "bun") { h1.setAttribute("fill", hc); if (h2) h2.setAttribute("fill", hc); const g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.setAttribute("class", "dhair"); g.innerHTML = `<circle cx="25" cy="10" r="7" fill="${hc}"/><circle cx="45" cy="10" r="7" fill="${hc}"/>`; s.appendChild(g); }
+      else if (hair === "bob") { h1.setAttribute("rx", "18"); h1.setAttribute("ry", "12"); h1.setAttribute("cy", "18"); if (h2) { h2.setAttribute("rx", "18"); h2.setAttribute("ry", "10"); h2.setAttribute("cy", "21"); } h1.setAttribute("fill", hc); if (h2) h2.setAttribute("fill", hc); const g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.setAttribute("class", "dhair"); g.innerHTML = `<rect x="17" y="18" width="10" height="18" rx="5" fill="${hc}"/><rect x="43" y="18" width="10" height="18" rx="5" fill="${hc}"/>`; s.insertBefore(g, s.querySelector("#mmface") || s.querySelector("circle")); }
+    }
+
+    function renderMM(m) {
+      if (!m) return;
+      const s = document.getElementById("mmsvg");
+      const oc = m.outfitcolor || MO[m.outfit] || "#4499ff";
+      const hc = m.haircolor || MH[m.hair] || "#5533cc";
+      ["#mmb", "#mmarm-l", "#mmarm-r", "#mmleg-l", "#mmleg-r"].forEach(id => s.querySelector(id)?.setAttribute("fill", oc));
+      ["#mmh", "#mmh2"].forEach(id => s.querySelector(id)?.setAttribute("fill", hc));
+      s.querySelector("#mmm")?.setAttribute("d", MF[m.face] || MF.smile);
+      applyHairStyle(s, m.hair, hc, "mm");
+      if (m.bg_color) document.getElementById("mmbox").style.background = `linear-gradient(180deg,${m.bg_color},${m.bg_color}cc)`;
+      s.querySelector(".macc")?.remove(); addAcc(s, m.accessory, "macc");
+    }
+
+    function addAcc(s, acc, cls) {
+      if (!acc || acc === "none") return;
+      const g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.setAttribute("class", cls);
+      if (acc === "glasses") g.innerHTML = '<circle cx="28" cy="27" r="5" fill="none" stroke="#333" stroke-width="1.5"/><circle cx="40" cy="27" r="5" fill="none" stroke="#333" stroke-width="1.5"/><line x1="33" y1="27" x2="35" y2="27" stroke="#333" stroke-width="1.5"/>';
+      else if (acc === "sunglasses") g.innerHTML = '<circle cx="28" cy="27" r="5" fill="#333" stroke="#000" stroke-width="1"/><circle cx="40" cy="27" r="5" fill="#333" stroke="#000" stroke-width="1"/><line x1="33" y1="27" x2="35" y2="27" stroke="#000" stroke-width="1.5"/>';
+      else if (acc === "hat") g.innerHTML = '<rect x="20" y="12" width="30" height="5" rx="2" fill="#cc3300"/><rect x="25" y="4" width="20" height="10" rx="2" fill="#cc3300"/>';
+      else if (acc === "cap") g.innerHTML = '<ellipse cx="35" cy="14" rx="14" ry="6" fill="#3355cc"/><rect x="35" y="13" width="14" height="4" rx="1" fill="#2244aa"/>';
+      else if (acc === "ribbon") g.innerHTML = '<path d="M31 10 L26 5 L31 10 L36 5 Z" fill="#ff55aa" stroke="#cc0066" stroke-width="1"/><circle cx="31" cy="10" r="2" fill="#ff0066"/>';
+      else if (acc === "earring") g.innerHTML = '<circle cx="19" cy="30" r="2" fill="#ffd700"/><circle cx="51" cy="30" r="2" fill="#ffd700"/>';
+      else if (acc === "mask") g.innerHTML = '<rect x="22" y="30" width="26" height="14" rx="4" fill="white" stroke="#ccc" stroke-width="1"/>';
+      s.appendChild(g);
+    }
+
+    function showSec(sec) {
+      ["home", "diary", "photos", "gb", "friends", "edit", "minime"].forEach(s => document.getElementById(`nav-${s}`)?.classList.remove("on"));
+      document.getElementById(`nav-${sec}`)?.classList.add("on");
+      const el = document.getElementById("hright");
+      el.innerHTML = '<div class="loading">⏳</div>';
+      if (sec === "home") loadHome(el);
+      else if (sec === "diary") loadDiary(el);
+      else if (sec === "photos") loadPhotos(el);
+      else if (sec === "gb") loadGb(el);
+      else if (sec === "friends") loadFriends(el);
+      else if (sec === "edit") loadEdit(el);
+      else if (sec === "minime") loadMMinme(el);
+    }
+
+    function loadHome(el) {
+      const p = cP;
+      el.innerHTML = `<div class="sectitle">🏠 ${esc(p.nickname)}의 홈</div><div class="profile-head"><div class="avt">${p.avatar_url ? `<img src="${p.avatar_url}">` : "🧑"}</div><div><div style="font-size:13px;font-weight:bold;color:#003080">${esc(p.nickname)}</div><div style="font-size:10px;color:#557;margin:2px 0">@${esc(p.username)}</div><div class="biobox">${esc(p.bio || "소개글이 없습니다")}</div></div></div><div id="ract"><div style="padding:6px;color:#888;font-size:10px">로딩중...</div></div><div id="rdiary"></div>`;
+      loadRActivity(); loadRDiary();
+    }
+
+    async function loadRActivity() {
+      const el = document.getElementById("ract"); if (!el) return;
+      try {
+        const [g, d] = await Promise.all([fetch(`${API}/api/guestbook/${visitUN}`), fetch(`${API}/api/diary/public/${visitUN}`)]);
+        const gb = g.ok ? await g.json() : []; const di = d.ok ? await d.json() : [];
+        let h = "";
+        if (gb.length) h += `<div style="font-size:10px;color:#336;padding:1px 0">📝 방명록 ${gb.length}개</div>`;
+        if (di.length) h += `<div style="font-size:10px;color:#336;padding:1px 0">📓 다이어리 ${di.length}개</div>`;
+        if (!h) h = '<div style="font-size:10px;color:#888">활동 내역 없음</div>';
+        el.innerHTML = h;
+      } catch (e) { el.innerHTML = ""; }
+    }
+
+    async function loadRDiary() {
+      const el = document.getElementById("rdiary"); if (!el) return;
+      try {
+        const r = await fetch(`${API}/api/diary/public/${visitUN}`);
+        if (!r.ok) return;
+        const entries = await r.json(); if (!entries.length) return;
+        const rows = entries.slice(0, 3).map(d => '<div class="ritem" onclick="showSec(\'diary\')"><span>' + esc(d.title) + '</span><span class="rdate">' + new Date(d.created_at).toLocaleDateString("ko-KR") + '</span></div>').join("");
+        el.innerHTML = '<div class="recentbox"><div class="rtitle">📓 최근 다이어리 <span class="tlink" style="font-size:10px;font-weight:normal" onclick="showSec(\'diary\')">더보기→</span></div>' + rows + '</div>';
+      } catch (e) { }
+    }
+
+    async function loadDiary(el) {
+      el.innerHTML = `<div class="sectitle">📓 다이어리${isOwner ? '<button class="btn btn-blue sm" onclick="toggleDWrite()">✏️ 글쓰기</button>' : ''}</div><div id="dwrap"></div><div id="dlist"><div class="loading">⏳</div></div>`;
+      try {
+        let r;
+        if (isOwner && cT) r = await aFetch(`${API}/api/diary/${visitUN}`);
+        else r = await fetch(`${API}/api/diary/public/${visitUN}`);
+        const entries = await r.json();
+        const list = document.getElementById("dlist"); if (!list) return;
+        if (!entries.length) { list.innerHTML = '<div style="text-align:center;padding:20px;color:#888">다이어리가 없습니다</div>'; return; }
+        list.innerHTML = entries.map(d => {
+          const pri = !d.is_public ? '<span class="dpri">🔒 비공개</span> ' : '';
+          const del = isOwner ? '<span class="tlink" style="color:#cc0000;font-size:10px" onclick="event.stopPropagation();delDiary(\'' + d.id + '\')">삭제</span>' : '';
+          return '<div class="dentry" onclick="toggleDCont(\'' + d.id + '\',\'' + encodeURIComponent(d.content) + '\')"><div class="dtitle">' + pri + esc(d.title) + '</div><div class="dmeta"><span>' + new Date(d.created_at).toLocaleDateString("ko-KR") + '</span>' + del + '</div><div class="dcontent" id="dc-' + d.id + '"></div></div>';
+        }).join("");
+      } catch (e) { const l = document.getElementById("dlist"); if (l) l.innerHTML = '<div style="color:#cc0000;padding:10px">로딩 오류</div>'; }
+    }
+
+    function toggleDWrite() {
+      const w = document.getElementById("dwrap"); if (!w) return;
+      if (w.innerHTML.trim()) { w.innerHTML = ""; return; }
+      w.innerHTML = '<div class="wform"><div style="font-size:11px;font-weight:bold;color:#003080;margin-bottom:5px">📝 새 다이어리</div><input type="text" id="dtitle" placeholder="제목"><textarea id="dcont" placeholder="내용을 입력하세요..."></textarea><div class="cbrow"><input type="checkbox" id="dpub" checked><label for="dpub">공개</label></div><div style="text-align:right;display:flex;gap:5px;justify-content:flex-end"><button class="btn" onclick="document.getElementById(\'dwrap\').innerHTML=\'\'" >취소</button><button class="btn btn-blue" onclick="submitDiary()">등록</button></div></div>';
+    }
+
+    function toggleDCont(id, enc) {
+      const el = document.getElementById(`dc-${id}`); if (!el) return;
+      if (el.style.display === "block") { el.style.display = "none"; }
+      else { el.innerHTML = esc(decodeURIComponent(enc)); el.style.display = "block"; }
+    }
+
+    async function submitDiary() {
+      const title = document.getElementById("dtitle")?.value.trim();
+      const content = document.getElementById("dcont")?.value.trim();
+      const is_public = document.getElementById("dpub")?.checked;
+      if (!title || !content) { toast("제목과 내용을 입력해 주세요"); return; }
+      try {
+        const r = await aFetch(`${API}/api/diary/write`, { method: "POST", body: JSON.stringify({ title, content, is_public }) });
+        if (!r.ok) { toast("저장 실패"); return; }
+        toast("다이어리가 등록되었습니다 📓"); showSec("diary");
+      } catch (e) { toast("오류 발생"); }
+    }
+
+    async function delDiary(id) {
+      if (!confirm("삭제하시겠습니까?")) return;
+      await aFetch(`${API}/api/diary/${id}`, { method: "DELETE" });
+      toast("삭제되었습니다"); showSec("diary");
+    }
+
+    async function loadPhotos(el) {
+      el.innerHTML = `<div class="sectitle">📷 사진첩${isOwner ? '<button class="btn btn-blue sm" onclick="togglePForm()">+ 추가</button>' : ''}</div><div id="pfwrap"></div><div id="pgrid" class="pgrid"></div>`;
+      try {
+        const r = await fetch(`${API}/api/photos/${visitUN}`);
+        const photos = await r.json();
+        const grid = document.getElementById("pgrid"); if (!grid) return;
+        if (!photos.length) { grid.className = ""; grid.innerHTML = '<div style="text-align:center;padding:20px;color:#888">사진이 없습니다</div>'; return; }
+        grid.innerHTML = photos.map(p => {
+          const del = isOwner ? '<span onclick="event.stopPropagation();delPhoto(\'' + p.id + '\')" style="margin-left:auto;cursor:pointer">🗑</span>' : '';
+          return '<div class="pitem"><img src="' + p.url + '" alt="' + esc(p.caption) + '" loading="lazy"><div class="povl"><span>' + esc(p.caption) + '</span>' + del + '</div></div>';
+        }).join("");
+      } catch (e) { }
+    }
+
+    function togglePForm() {
+      const w = document.getElementById("pfwrap"); if (!w) return;
+      if (w.innerHTML.trim()) { w.innerHTML = ""; return; }
+      w.innerHTML = '<div class="wform"><div style="font-size:11px;font-weight:bold;color:#003080;margin-bottom:5px">📷 사진 추가 (이미지 URL)</div><input type="text" id="purl" placeholder="https://..." style="width:100%;border:1px solid #808080;padding:3px 4px;font-size:11px;margin-bottom:4px;box-sizing:border-box"><input type="text" id="pcap" placeholder="사진 설명 (선택)" style="width:100%;border:1px solid #808080;padding:3px 4px;font-size:11px;margin-bottom:4px;box-sizing:border-box"><div style="text-align:right;display:flex;gap:5px;justify-content:flex-end"><button class="btn" onclick="document.getElementById(\'pfwrap\').innerHTML=\'\'" >취소</button><button class="btn btn-blue" onclick="submitPhoto()">등록</button></div></div>';
+    }
+
+    async function submitPhoto() {
+      const url = document.getElementById("purl")?.value.trim();
+      const caption = document.getElementById("pcap")?.value.trim() || "";
+      if (!url) { toast("URL을 입력해 주세요"); return; }
+      try {
+        const r = await aFetch(`${API}/api/photos/upload`, { method: "POST", body: JSON.stringify({ url, caption }) });
+        if (!r.ok) { toast("업로드 실패"); return; }
+        toast("사진이 추가되었습니다 📷"); showSec("photos");
+      } catch (e) { toast("오류 발생"); }
+    }
+
+    async function delPhoto(id) {
+      if (!confirm("삭제하시겠습니까?")) return;
+      await aFetch(`${API}/api/photos/${id}`, { method: "DELETE" });
+      toast("삭제되었습니다"); showSec("photos");
+    }
+
+    async function loadGb(el) {
+      el.innerHTML = `<div class="sectitle">📝 방명록</div>${cU ? '<div class="gbwrite"><div style="font-size:11px;font-weight:bold;color:#003080;margin-bottom:3px">방명록 쓰기</div><textarea id="gbtxt" placeholder="방명록을 남겨보세요 ✨"></textarea><div style="text-align:right;margin-top:3px"><button class="btn btn-blue" onclick="submitGb()">등록</button></div></div>' : ''}<div id="gblist"><div class="loading">⏳</div></div>`;
+      try {
+        const r = await fetch(`${API}/api/guestbook/${visitUN}`);
+        const entries = await r.json();
+        const list = document.getElementById("gblist"); if (!list) return;
+        if (!entries.length) { list.innerHTML = '<div style="text-align:center;padding:20px;color:#888">방명록이 없습니다</div>'; return; }
+        list.innerHTML = entries.map(e => {
+          const del = (cU && (cU.id === e.author_id || cU.id === cP.id)) ? '<span class="gbdel" onclick="delGb(\'' + e.id + '\')">삭제</span>' : '';
+          return '<div class="gbentry"><div class="gbhead"><span class="gbauthor" onclick="showHompy(\'' + e.author?.username + '\')">' + esc(e.author?.nickname || "익명") + '</span><span><span class="gbdate">' + new Date(e.created_at).toLocaleDateString("ko-KR") + '</span>' + del + '</span></div><div class="gbcont">' + esc(e.content) + '</div></div>';
+        }).join("");
+      } catch (e) { }
+    }
+
+    async function submitGb() {
+      const content = document.getElementById("gbtxt")?.value.trim();
+      if (!content) { toast("내용을 입력해 주세요"); return; }
+      try {
+        const r = await aFetch(`${API}/api/guestbook/write`, { method: "POST", body: JSON.stringify({ owner_username: visitUN, content }) });
+        if (!r.ok) { toast("등록 실패"); return; }
+        toast("방명록이 등록되었습니다 ✨"); showSec("gb");
+      } catch (e) { toast("오류 발생"); }
+    }
+
+    async function delGb(id) {
+      if (!confirm("삭제하시겠습니까?")) return;
+      await aFetch(`${API}/api/guestbook/${id}`, { method: "DELETE" });
+      toast("삭제되었습니다"); showSec("gb");
+    }
+
+    async function loadFriends(el) {
+      const fsForm = cU ? '<div class="fsbox"><div class="fstitle">💌 일촌 신청</div><div class="fsrow"><input id="fsinput" placeholder="아이디 또는 닉네임 검색" onkeydown="if(event.key===\'Enter\')searchFriend()"><button class="btn sm" onclick="searchFriend()">검색</button></div><div id="fsres"></div><div id="fslabel" style="display:none" class="fslabelform"><div style="font-size:11px;color:\'#886600\';margin-bottom:5px">선택: <b id="fsselname"></b></div><div class="frow" style="margin-bottom:4px"><label style="width:75px">나의 ○○</label><input id="fsfrom" placeholder="친구, 오빠, 언니" style="flex:1;border:1px solid #808080;padding:2px 4px;font-size:11px;font-family:Dotum,sans-serif"></div><div class="frow" style="margin-bottom:4px"><label style="width:75px">상대방 ○○</label><input id="fsto" placeholder="동생, 친구" style="flex:1;border:1px solid #808080;padding:2px 4px;font-size:11px;font-family:Dotum,sans-serif"></div><div style="text-align:right;display:flex;gap:5px;justify-content:flex-end;margin-top:5px"><button class="btn sm" onclick="document.getElementById(\'fslabel\').style.display=\'none\'">취소</button><button class="btn btn-blue sm" onclick="submitFriendReq()">신청하기</button></div></div></div>' : '';
+      el.innerHTML = '<div class="sectitle">👥 일촌</div>' + fsForm + '<div id="pendwrap"></div><div id="flist"><div class="loading">⏳</div></div>';
+      if (isOwner && cT) {
+        try {
+          const pr = await aFetch(`${API}/api/friends/pending/me`);
+          const pending = await pr.json();
+          const pw = document.getElementById("pendwrap");
+          if (pw && pending.length) {
+            const rows = pending.map(p => '<div class="freq"><div style="font-size:11px"><b class="tlink" onclick="showHompy(\'' + p.from_profile?.username + '\')">' + esc(p.from_profile?.nickname || "?") + '</b>님 신청<br><span style="font-size:10px;color:#666">나의 ' + esc(p.to_label) + ' / 상대의 ' + esc(p.from_label) + '</span></div><div style="display:flex;gap:3px"><button class="btn btn-blue sm" onclick="acceptFriend(\'' + p.id + '\')">수락</button><button class="btn btn-red sm" onclick="rejectFriend(\'' + p.id + '\')">거절</button></div></div>').join("");
+            pw.innerHTML = '<div style="background:#fff8e0;border:1px solid #e0c060;padding:7px;margin-bottom:7px"><div style="font-size:11px;font-weight:bold;color:#886600;margin-bottom:4px">💌 일촌 신청 대기 (' + pending.length + ')</div>' + rows + '</div>';
+          }
+        } catch (e) { }
+      }
+      try {
+        const r = await fetch(`${API}/api/friends/list/${cP.id}`);
+        const friends = await r.json();
+        const list = document.getElementById("flist"); if (!list) return;
+        if (!friends.length) { list.innerHTML = '<div style="text-align:center;padding:20px;color:#888">일촌이 없습니다</div>'; return; }
+        const fcards = friends.map(f => {
+          const other = f.from_user === cP.id ? f.to_profile : f.from_profile;
+          const label = f.from_user === cP.id ? f.to_label : f.from_label;
+          const avt = other?.avatar_url ? '<img src="' + other.avatar_url + '">' : "🧑";
+          const del = isOwner ? '<div style="margin-top:3px"><span class="tlink" style="color:#cc0000;font-size:10px" onclick="event.stopPropagation();removeFriend(\'' + f.id + '\')">삭제</span></div>' : '';
+          return '<div class="fcard" onclick="showHompy(\'' + other?.username + '\')"><div class="favt">' + avt + '</div><div class="fname">' + esc(other?.nickname || "?") + '</div><div class="flabel">나의 ' + esc(label || "일촌") + '</div>' + del + '</div>';
+        }).join("");
+        list.innerHTML = '<div class="fgrid">' + fcards + '</div>';
+      } catch (e) { }
+    }
+
+    async function searchFriend() {
+      const q = document.getElementById("fsinput")?.value.trim(); if (!q) { toast("검색어를 입력해 주세요"); return; }
+      const res = document.getElementById("fsres"); if (!res) return;
+      res.innerHTML = '<div style="font-size:11px;color:#666;padding:3px">검색 중...</div>';
+      try {
+        const r = await fetch(`${API}/api/search/users?q=${encodeURIComponent(q)}`);
+        const data = await r.json();
+        if (!data.length) { res.innerHTML = '<div style="font-size:11px;color:#888;padding:3px">검색 결과가 없습니다</div>'; return; }
+        res.innerHTML = data.filter(u => u.username !== cUN).map(u => `<div class="fsresitem" onclick="pickFriend('${u.username}','${esc(u.nickname)}')"><span style="font-weight:bold;color:#003080">${esc(u.nickname)}</span><span style="color:#888">@${esc(u.username)}</span></div>`).join("");
+      } catch (e) { res.innerHTML = '<div style="color:#cc0000;padding:3px">오류 발생</div>'; }
+    }
+
+    function pickFriend(username, nickname) {
+      selFriend_un = username;
+      const n = document.getElementById("fsselname"), f = document.getElementById("fslabel"), r = document.getElementById("fsres");
+      if (n) n.textContent = `${nickname} (@${username})`; if (f) f.style.display = "block"; if (r) r.innerHTML = "";
+    }
+
+    async function submitFriendReq() {
+      const from_label = document.getElementById("fsfrom")?.value.trim();
+      const to_label = document.getElementById("fsto")?.value.trim();
+      if (!from_label || !to_label) { toast("일촌 이름을 입력해 주세요"); return; }
+      if (!selFriend_un) { toast("상대방을 선택해 주세요"); return; }
+      try {
+        const r = await aFetch(`${API}/api/friends/request`, { method: "POST", body: JSON.stringify({ to_username: selFriend_un, from_label, to_label }) });
+        if (!r.ok) { const d = await r.json(); toast(d.detail || "신청 실패"); return; }
+        toast("일촌 신청 완료! 💌"); selFriend_un = "";
+        const f = document.getElementById("fslabel"); if (f) f.style.display = "none";
+        const i = document.getElementById("fsinput"); if (i) i.value = "";
+      } catch (e) { toast("오류 발생"); }
+    }
+
+    async function acceptFriend(id) { await aFetch(`${API}/api/friends/accept/${id}`, { method: "POST", body: JSON.stringify({ friend_id: id }) }); toast("일촌 수락 완료! 💕"); showSec("friends"); }
+    async function rejectFriend(id) { await aFetch(`${API}/api/friends/${id}`, { method: "DELETE" }); toast("거절했습니다"); showSec("friends"); }
+    async function removeFriend(id) { if (!confirm("일촌을 끊으시겠습니까?")) return; await aFetch(`${API}/api/friends/${id}`, { method: "DELETE" }); toast("일촌이 삭제되었습니다"); showSec("friends"); }
+
+    function loadEdit(el) {
+      const p = cP;
+      el.innerHTML = `<div class="sectitle">✏️ 미니홈피 꾸미기</div><div style="margin-bottom:6px"><button class="btn sm" onclick="showSec('minime')">🎨 미니미 꾸미기</button></div><div class="editform"><div style="font-size:11px;font-weight:bold;color:#003080;margin-bottom:7px">프로필 수정</div><div class="frow"><label>닉네임</label><input id="enick" value="${esc(p.nickname || '')}"></div><div class="frow"><label>소개</label><textarea id="ebio" style="flex:1">${esc(p.bio || '')}  </textarea></div><div class="frow"><label>프사 URL</label><input id="eavatar" value="${esc(p.avatar_url || '')}" placeholder="https://..."></div><div class="frow"><label>BGM URL</label><input id="ebgm" value="${esc(p.bg_music || '')}" placeholder="음악 파일 URL"></div><div class="frow"><label>연인 날짜</label><input type="date" id="ecouple" value="${p.couple_date ? p.couple_date.split('T')[0] : ''}"></div><div style="text-align:right;margin-top:7px"><button class="btn btn-blue" onclick="saveProfile()">저장</button></div></div>`;
+    }
+
+    async function saveProfile() {
+      const data = { nickname: document.getElementById("enick")?.value.trim(), bio: document.getElementById("ebio")?.value.trim(), avatar_url: document.getElementById("eavatar")?.value.trim(), bg_music: document.getElementById("ebgm")?.value.trim(), couple_date: document.getElementById("ecouple")?.value || null };
+      try {
+        const r = await aFetch(`${API}/api/profiles/me/update`, { method: "PUT", body: JSON.stringify(data) });
+        if (!r.ok) { toast("저장 실패"); return; }
+        const updated = await r.json(); localStorage.setItem("cy_p", JSON.stringify(updated)); cP = updated; renderHUI(updated); toast("저장 완료! ✨"); showSec("home");
+      } catch (e) { toast("오류 발생"); }
+    }
+
+    let pendMM = {};
+    function loadMMinme(el) {
+      const m = cMM || { hair: "short", face: "smile", outfit: "casual", accessory: "none", bg_color: "#a8d8ea" };
+      el.innerHTML = `<div class="sectitle">🎨 미니미 꾸미기</div><div class="mmeditor"><div class="mmprev" id="mmprev"><svg id="psvg" viewBox="0 0 70 100" width="88" height="108" xmlns="http://www.w3.org/2000/svg"><ellipse cx="35" cy="97" rx="14" ry="3" fill="rgba(0,0,0,0.1)"/><ellipse cx="35" cy="68" rx="18" ry="22" fill="#4499ff" id="pvb"/><rect x="30" y="44" width="10" height="8" fill="#ffe0b0"/><ellipse cx="14" cy="62" rx="6" ry="10" fill="#4499ff" id="pvarm-l" transform="rotate(-15,14,62)"/><ellipse cx="56" cy="62" rx="6" ry="10" fill="#4499ff" id="pvarm-r" transform="rotate(15,56,62)"/><circle cx="11" cy="72" r="4.5" fill="#ffe0b0"/><circle cx="59" cy="72" r="4.5" fill="#ffe0b0"/><ellipse cx="27" cy="88" rx="6" ry="9" fill="#4499ff" id="pvleg-l"/><ellipse cx="43" cy="88" rx="6" ry="9" fill="#4499ff" id="pvleg-r"/><ellipse cx="26" cy="95" rx="7" ry="4" fill="#333"/><ellipse cx="44" cy="95" rx="7" ry="4" fill="#333"/><circle cx="35" cy="30" r="18" fill="#ffe0b0"/><circle cx="24" cy="34" r="4" fill="#ffb8b8" opacity="0.6"/><circle cx="46" cy="34" r="4" fill="#ffb8b8" opacity="0.6"/><ellipse cx="28" cy="29" rx="3.5" ry="4" fill="white"/><ellipse cx="42" cy="29" rx="3.5" ry="4" fill="white"/><circle cx="29" cy="30" r="2" fill="#333" id="pvpupil-l"/><circle cx="43" cy="30" r="2" fill="#333" id="pvpupil-r"/><circle cx="30" cy="29" r="0.7" fill="white"/><circle cx="44" cy="29" r="0.7" fill="white"/><path d="M29 37 Q35 42 41 37" stroke="#c07050" stroke-width="1.8" fill="none" stroke-linecap="round" id="pvm"/><ellipse cx="35" cy="16" rx="18" ry="10" fill="#5533cc" id="pvh"/><ellipse cx="35" cy="20" rx="18" ry="8" fill="#5533cc" id="pvh2"/></svg></div><div class="optgrp"><label>💇 머리 스타일</label><div class="optrow">${[["short", "단발"], ["long", "긴머리"], ["curl", "곱슬"], ["bun", "묶음"], ["bob", "보브"], ["none", "민머리"]].map(([v, l]) => `<button class="obtn ${m.hair === v ? "on" : ""}" onclick="setMM(this,'hair','${v}')">${l}</button>`).join("")}</div></div><div class="optgrp"><label>🎨 머리 색</label><div class="optrow">${[["#222222", "검정"], ["#884400", "갈색"], ["#ffcc44", "금발"], ["#cc3355", "빨강"], ["#3355cc", "파랑"], ["#ff88cc", "핑크"], ["#eeeeee", "흰색"], ["#8833cc", "보라"]].map(([c, n]) => `<button class="cbtn ${(m.haircolor || "#5533cc") === c ? "on" : ""}" onclick="setMM(this,'haircolor','${c}')" style="background:${c}" title="${n}"></button>`).join("")}</div></div><div class="optgrp"><label>😊 표정</label><div class="optrow">${[["smile", "😊웃음"], ["sad", "😢슬픔"], ["neutral", "😐무표정"], ["wink", "😉윙크"], ["angry", "😠화남"], ["surprised", "😲놀람"], ["happy", "😄크게웃음"], ["shy", "😳수줍음"]].map(([v, l]) => `<button class="obtn ${m.face === v ? "on" : ""}" onclick="setMM(this,'face','${v}')">${l}</button>`).join("")}</div></div><div class="optgrp"><label>👕 의상</label><div class="optrow">${[["casual", "캐주얼"], ["formal", "포멀"], ["sporty", "스포티"], ["cute", "큐트"], ["school", "교복"], ["hanbok", "한복"], ["summer", "여름"], ["winter", "겨울"]].map(([v, l]) => `<button class="obtn ${m.outfit === v ? "on" : ""}" onclick="setMM(this,'outfit','${v}')">${l}</button>`).join("")}</div></div><div class="optgrp"><label>🎨 옷 색</label><div class="optrow">${[["#4499ff", "파랑"], ["#ff6633", "주황"], ["#ff88cc", "핑크"], ["#334466", "남색"], ["#44aa44", "초록"], ["#cc3300", "빨강"], ["#ffcc00", "노랑"], ["#9933cc", "보라"], ["#ffffff", "흰색"], ["#333333", "검정"]].map(([c, n]) => `<button class="cbtn ${(m.outfitcolor || "#4499ff") === c ? "on" : ""}" onclick="setMM(this,'outfitcolor','${c}')" style="background:${c}${c === "#ffffff" ? ";border-color:#aaa" : ""}" title="${n}"></button>`).join("")}</div></div><div class="optgrp"><label>✨ 액세서리</label><div class="optrow">${[["none", "없음"], ["glasses", "👓안경"], ["sunglasses", "🕶선글라스"], ["hat", "🎩모자"], ["cap", "🧢캡"], ["ribbon", "🎀리본"], ["earring", "💎귀걸이"], ["mask", "😷마스크"]].map(([v, l]) => `<button class="obtn ${m.accessory === v ? "on" : ""}" onclick="setMM(this,'accessory','${v}')">${l}</button>`).join("")}</div></div><div class="optgrp"><label>🖼 배경색</label><div class="optrow">${[["#a8d8ea", "하늘"], ["#ffb3c1", "핑크"], ["#b5ead7", "민트"], ["#ffd700", "노랑"], ["#c9b1ff", "보라"], ["#ffd4a3", "살구"], ["#b5d5ff", "연파랑"], ["#d4f0a0", "연두"], ["#ffffff", "흰색"], ["#222222", "검정"]].map(([c, n]) => `<button class="cbtn ${m.bg_color === c ? "on" : ""}" onclick="setMM(this,'bg_color','${c}')" style="background:${c}${c === "#ffffff" ? ";border-color:#aaa" : ""}" title="${n}"></button>`).join("")}</div></div><div style="text-align:right;margin-top:8px"><button class="btn btn-blue" onclick="saveMinime()">저장하기</button></div></div>`;
+      renderMMPreview(Object.assign({}, m));
+    }
+
+    function setMM(btn, key, val) {
+      btn.closest(".optrow").querySelectorAll(".obtn,.cbtn").forEach(b => b.classList.remove("on"));
+      btn.classList.add("on"); pendMM[key] = val;
+      renderMMPreview(Object.assign({}, cMM || {}, pendMM));
+    }
+
+    function renderMMPreview(m) {
+      const s = document.getElementById("psvg"); if (!s) return;
+      const oc = m.outfitcolor || MO[m.outfit] || "#4499ff";
+      const hc = m.haircolor || MH[m.hair] || "#5533cc";
+      ["#pvb", "#pvarm-l", "#pvarm-r", "#pvleg-l", "#pvleg-r"].forEach(id => s.querySelector(id)?.setAttribute("fill", oc));
+      ["#pvh", "#pvh2"].forEach(id => s.querySelector(id)?.setAttribute("fill", hc));
+      s.querySelector("#pvm")?.setAttribute("d", MF[m.face] || MF.smile);
+      applyHairStyle(s, m.hair, hc, "pv");
+      s.querySelector(".pacc")?.remove(); addAcc(s, m.accessory, "pacc");
+      const box = document.getElementById("mmprev"); if (box && m.bg_color) box.style.background = `linear-gradient(180deg,${m.bg_color},${m.bg_color}cc)`;
+    }
+
+    async function saveMinime() {
+      const data = Object.assign({}, cMM || {}, pendMM); delete data.id; delete data.user_id;
+      try {
+        const r = await aFetch(`${API}/api/minime/me/update`, { method: "PUT", body: JSON.stringify(data) });
+        if (!r.ok) { toast("저장 실패"); return; }
+        cMM = await r.json(); pendMM = {}; renderMM(cMM); toast("미니미가 저장되었습니다 🎨"); showSec("home");
+      } catch (e) { toast("오류 발생"); }
+    }
+
+    function goMMEdit() { if (isOwner) showSec("minime"); }
+
+    async function doSearch() {
+      const q = document.getElementById("sq")?.value.trim(); if (!q) return;
+      const res = document.getElementById("sresults"); if (!res) return;
+      res.innerHTML = '<div class="loading">⏳ 검색 중...</div>';
+      try {
+        const r = await fetch(`${API}/api/search/users?q=${encodeURIComponent(q)}`);
+        const data = await r.json();
+        if (!data.length) { res.innerHTML = '<div style="text-align:center;padding:20px;color:#888">검색 결과가 없습니다</div>'; return; }
+        res.innerHTML = data.map(u => {
+          const avt = u.avatar_url ? '<img src="' + u.avatar_url + '">' : "🧑";
+          const bio = u.bio ? '<div style="font-size:10px;color:#888">' + esc(u.bio.substring(0, 30)) + '</div>' : '';
+          return '<div class="sres" onclick="showHompy(\'' + u.username + '\');closeSearch()"><div class="savt">' + avt + '</div><div><div style="font-size:12px;font-weight:bold;color:#003080">' + esc(u.nickname) + '</div><div style="font-size:10px;color:#666">@' + esc(u.username) + '</div>' + bio + '</div></div>';
+        }).join("");
+      } catch (e) { res.innerHTML = '<div style="color:#cc0000">오류 발생</div>'; }
+    }
+
+    function toggleBgm() {
+      const a = document.getElementById("bgmaudio"); const c = document.querySelector(".bgmc");
+      if (a.paused) { if (cP?.bg_music) { a.src = cP.bg_music; a.play().catch(() => toast("BGM을 재생할 수 없습니다")); } if (c) c.textContent = "⏸"; }
+      else { a.pause(); if (c) c.textContent = "▶"; }
+    }
+
+    function esc(s) { if (!s) return ""; return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;"); }
+    async function aFetch(url, opts = {}) { if (!cT) throw new Error("Not authenticated"); return fetch(url, { ...opts, headers: { "Content-Type": "application/json", "Authorization": `Bearer ${cT}`, ...(opts.headers || {}) } }); }
+
+    loadSess();
+  </script>
+</body>
+
+</html>
