@@ -405,13 +405,6 @@
       font-size: 12px;
     }
 
-    .cy-header {
-      background: linear-gradient(180deg, #4488ee 0%, #2266cc 40%, #1155bb 100%);
-      padding: 0;
-      border-bottom: 2px solid #0d44aa;
-      flex-shrink: 0;
-    }
-
     .cy-header-top {
       padding: 5px 10px;
       display: flex;
@@ -1247,12 +1240,6 @@
       <div class="hompy-notebook-inner">
         <div class="cy-header">
           <div class="cy-header-top">
-            <div class="cy-logo-sm">Cy<span>world</span></div>
-            <div class="cy-nav">
-              <a onclick="goMyHompy()">내홈피</a>
-              <a onclick="openSearch()">친구찾기</a>
-              <a onclick="doLogout()">로그아웃</a>
-            </div>
           </div>
           <div class="cy-visitbar">
             <span>TODAY</span><span class="vcount" id="vtoday">001</span>
@@ -1510,8 +1497,38 @@
 
     function loadHome(el) {
       const p = cP;
-      el.innerHTML = `<div class="sectitle">🏠 ${esc(p.nickname)}의 홈</div><div class="profile-head"><div class="avt">${p.avatar_url ? `<img src="${p.avatar_url}">` : "🧑"}</div><div><div style="font-size:13px;font-weight:bold;color:#003080">${esc(p.nickname)}</div><div style="font-size:10px;color:#557;margin:2px 0">@${esc(p.username)}</div><div class="biobox">${esc(p.bio || "소개글이 없습니다")}</div></div></div><div id="ract"><div style="padding:6px;color:#888;font-size:10px">로딩중...</div></div><div id="rdiary"></div>`;
-      loadRActivity(); loadRDiary();
+      el.innerHTML = `
+    <div style="padding:8px;">
+      <div style="font-size:13px;font-weight:bold;color:#1144aa;border-bottom:2px solid #3366cc;padding-bottom:4px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+        🏠 ${esc(p.nickname)}의 홈
+        <span style="font-size:10px;color:#888;">http://www.cyworld.com/${esc(p.username)}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+        <div style="background:#f0f6ff;border:1px solid #aabbdd;border-radius:3px;padding:6px;">
+          <div style="font-size:10px;font-weight:bold;color:#1144aa;border-bottom:1px solid #ccddf0;padding-bottom:3px;margin-bottom:5px;">📰 Updated news</div>
+          <div id="ract" style="font-size:11px;color:#333;"></div>
+        </div>
+        <div style="background:#f0f6ff;border:1px solid #aabbdd;border-radius:3px;padding:6px;">
+          <div style="font-size:10px;font-weight:bold;color:#1144aa;border-bottom:1px solid #ccddf0;padding-bottom:3px;margin-bottom:5px;">📊 미니홈피 현황</div>
+          <table style="width:100%;font-size:10px;border-collapse:collapse;">
+            <tr><td style="color:#6677aa;padding:1px 0;">다이어리</td><td id="cnt-diary">-</td><td style="color:#6677aa;padding:1px 0;">방명록</td><td id="cnt-gb">-</td></tr>
+            <tr><td style="color:#6677aa;padding:1px 0;">사진첩</td><td id="cnt-photo">-</td><td style="color:#6677aa;padding:1px 0;">일촌</td><td id="cnt-friend">-</td></tr>
+          </table>
+        </div>
+      </div>
+      <div style="background:#f0f6ff;border:1px solid #aabbdd;border-radius:3px;padding:6px;margin-bottom:8px;">
+        <div style="font-size:10px;font-weight:bold;color:#1144aa;border-bottom:1px solid #ccddf0;padding-bottom:3px;margin-bottom:5px;">🎵 Mini Room <span style="font-size:9px;color:#888;font-weight:normal;">EXPRESS YOURSELF</span><span style="float:right;color:#3366cc;font-weight:bold;font-size:10px;">${esc(p.nickname)}</span></div>
+        <div style="background:linear-gradient(135deg,#e8f4ff,#d0e8ff);border:1px solid #aabbdd;border-radius:3px;min-height:80px;display:flex;align-items:center;justify-content:center;color:#6688aa;font-size:11px;">
+          🏠 미니룸
+        </div>
+      </div>
+      <div style="background:#f0f6ff;border:1px solid #aabbdd;border-radius:3px;padding:6px;">
+        <div style="font-size:10px;font-weight:bold;color:#1144aa;border-bottom:1px solid #ccddf0;padding-bottom:3px;margin-bottom:5px;">💬 What friends say <span style="font-size:9px;color:#888;font-weight:normal;">한마디로 표현한다면~</span></div>
+        <div id="rdiary" style="font-size:11px;"></div>
+      </div>
+    </div>
+  `;
+      loadRActivity(); loadRDiary(); loadCounts();
     }
 
     async function loadRActivity() {
@@ -1793,6 +1810,24 @@
     function esc(s) { if (!s) return ""; return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;"); }
     async function aFetch(url, opts = {}) { if (!cT) throw new Error("Not authenticated"); return fetch(url, { ...opts, headers: { "Content-Type": "application/json", "Authorization": `Bearer ${cT}`, ...(opts.headers || {}) } }); }
 
+    async function loadCounts() {
+      try {
+        const [d, g, ph, fr] = await Promise.all([
+          fetch(`${API}/api/diary/public/${visitUN}`),
+          fetch(`${API}/api/guestbook/${visitUN}`),
+          fetch(`${API}/api/photos/${visitUN}`),
+          fetch(`${API}/api/friends/list/${cP.id}`)
+        ]);
+        const diary = d.ok ? await d.json() : [];
+        const gb = g.ok ? await g.json() : [];
+        const photo = ph.ok ? await ph.json() : [];
+        const friend = fr.ok ? await fr.json() : [];
+        const dc = document.getElementById("cnt-diary"); if (dc) dc.textContent = diary.length;
+        const gc = document.getElementById("cnt-gb"); if (gc) gc.textContent = gb.length;
+        const pc = document.getElementById("cnt-photo"); if (pc) pc.textContent = photo.length;
+        const fc = document.getElementById("cnt-friend"); if (fc) fc.textContent = friend.length;
+      } catch (e) { }
+    }
     loadSess();
   </script>
 </body>
