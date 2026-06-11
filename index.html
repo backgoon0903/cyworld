@@ -166,6 +166,7 @@
       border-radius: 10px;
       width: 85vw;
       max-width: 360px;
+      min-height: 420px;
       max-height: 85vh;
       border: none;
       position: relative;
@@ -251,10 +252,33 @@
       flex-direction: column;
       z-index: 500;
       overflow: hidden;
+      justify-content: center;
+      align-items: center;
     }
 
     #hompy-full.visible {
       display: flex;
+    }
+
+    .hompy-notebook {
+      background: #4db8e8;
+      border-radius: 14px;
+      padding: 10px;
+      width: 95vw;
+      max-width: 900px;
+      height: 90vh;
+      box-shadow: 0 4px 24px rgba(0, 80, 140, 0.5);
+    }
+
+    .hompy-notebook-inner {
+      background: white;
+      border-radius: 8px;
+      border: 2px dashed #90cce8;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     .btn {
@@ -1199,9 +1223,10 @@
         </div>
       </div>
       <div class="cy-page" id="signup-page">
-        <div style="text-align:center;margin-bottom:28px;">
-          <div class="cy-logo-txt">Cyworld</div>
-          <div style="font-size:11px;color:#aabbcc;margin-top:5px;letter-spacing:0.5px;">회원가입</div>
+        <div style="text-align:center;margin-bottom:32px;">
+          <div class="icon">
+            <img src="image/cyworldlogin.png" alt="cyworldlogins" style="width: 200px;">
+          </div>
         </div>
         <div style="width:100%;">
           <input class="cy-input" id="suid" type="text" placeholder="아이디 (영문+숫자)">
@@ -1218,87 +1243,92 @@
 
   <!-- 홈피 전체화면 -->
   <div id="hompy-full">
-    <div class="cy-header">
-      <div class="cy-header-top">
-        <div class="cy-logo-sm">Cy<span>world</span></div>
-        <div class="cy-nav">
-          <a onclick="goMyHompy()">내홈피</a>
-          <a onclick="openSearch()">친구찾기</a>
-          <a onclick="doLogout()">로그아웃</a>
+    <div class="hompy-notebook">
+      <div class="hompy-notebook-inner">
+        <div class="cy-header">
+          <div class="cy-header-top">
+            <div class="cy-logo-sm">Cy<span>world</span></div>
+            <div class="cy-nav">
+              <a onclick="goMyHompy()">내홈피</a>
+              <a onclick="openSearch()">친구찾기</a>
+              <a onclick="doLogout()">로그아웃</a>
+            </div>
+          </div>
+          <div class="cy-visitbar">
+            <span>TODAY</span><span class="vcount" id="vtoday">001</span>
+            <span>TOTAL</span><span class="vcount" id="vtotal">000000</span>
+            <span class="cy-ownertxt" id="howner"></span>
+          </div>
         </div>
-      </div>
-      <div class="cy-visitbar">
-        <span>TODAY</span><span class="vcount" id="vtoday">001</span>
-        <span>TOTAL</span><span class="vcount" id="vtotal">000000</span>
-        <span class="cy-ownertxt" id="howner"></span>
-      </div>
-    </div>
-    <div class="bgmbar" id="bgmbar" style="display:none">
-      <span>♪</span><span class="bgmt" id="bgmt">BGM</span><span class="bgmc" onclick="toggleBgm()">▶</span>
-    </div>
-    <div class="cy-layout" style="flex:1;min-height:0;">
-      <div class="cy-left">
-        <div class="mmbox" id="mmbox" onclick="goMMEdit()">
-          <svg id="mmsvg" viewBox="0 0 70 100" width="116" height="90" xmlns="http://www.w3.org/2000/svg">
-            <ellipse cx="35" cy="97" rx="14" ry="3" fill="rgba(0,0,0,0.1)" />
-            <ellipse cx="35" cy="68" rx="18" ry="22" fill="#4499ff" id="mmb" />
-            <rect x="30" y="44" width="10" height="8" fill="#ffe0b0" />
-            <ellipse cx="14" cy="62" rx="6" ry="10" fill="#4499ff" id="mmarm-l" transform="rotate(-15,14,62)" />
-            <ellipse cx="56" cy="62" rx="6" ry="10" fill="#4499ff" id="mmarm-r" transform="rotate(15,56,62)" />
-            <circle cx="11" cy="72" r="4.5" fill="#ffe0b0" />
-            <circle cx="59" cy="72" r="4.5" fill="#ffe0b0" />
-            <ellipse cx="27" cy="88" rx="6" ry="9" fill="#4499ff" id="mmleg-l" />
-            <ellipse cx="43" cy="88" rx="6" ry="9" fill="#4499ff" id="mmleg-r" />
-            <ellipse cx="26" cy="95" rx="7" ry="4" fill="#333" />
-            <ellipse cx="44" cy="95" rx="7" ry="4" fill="#333" />
-            <circle cx="35" cy="30" r="18" fill="#ffe0b0" id="mmface" />
-            <circle cx="24" cy="34" r="4" fill="#ffb8b8" opacity="0.6" />
-            <circle cx="46" cy="34" r="4" fill="#ffb8b8" opacity="0.6" />
-            <ellipse cx="28" cy="29" rx="3.5" ry="4" fill="white" />
-            <ellipse cx="42" cy="29" rx="3.5" ry="4" fill="white" />
-            <circle cx="29" cy="30" r="2" fill="#333" />
-            <circle cx="43" cy="30" r="2" fill="#333" />
-            <circle cx="30" cy="29" r="0.7" fill="white" />
-            <circle cx="44" cy="29" r="0.7" fill="white" />
-            <path d="M29 37 Q35 42 41 37" stroke="#c07050" stroke-width="1.8" fill="none" stroke-linecap="round"
-              id="mmm" />
-            <ellipse cx="35" cy="16" rx="18" ry="10" fill="#5533cc" id="mmh" />
-            <ellipse cx="35" cy="20" rx="18" ry="8" fill="#5533cc" id="mmh2" />
-          </svg>
+        <div class="bgmbar" id="bgmbar" style="display:none">
+          <span>♪</span><span class="bgmt" id="bgmt">BGM</span><span class="bgmc" onclick="toggleBgm()">▶</span>
         </div>
-        <div class="cy-pname" id="sbname">닉네임</div>
-        <div class="cy-pid" id="sbid">@아이디</div>
-        <div id="ddaybox" class="ddaybox" style="display:none">
-          <div class="ddaylabel">💕 우리 만난지</div>
-          <div class="ddaynum" id="ddaynum">D+0</div>
+        <div class="cy-layout" style="flex:1;min-height:0;">
+          <div class="cy-left">
+            <div class="mmbox" id="mmbox" onclick="goMMEdit()">
+              <svg id="mmsvg" viewBox="0 0 70 100" width="116" height="90" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="35" cy="97" rx="14" ry="3" fill="rgba(0,0,0,0.1)" />
+                <ellipse cx="35" cy="68" rx="18" ry="22" fill="#4499ff" id="mmb" />
+                <rect x="30" y="44" width="10" height="8" fill="#ffe0b0" />
+                <ellipse cx="14" cy="62" rx="6" ry="10" fill="#4499ff" id="mmarm-l" transform="rotate(-15,14,62)" />
+                <ellipse cx="56" cy="62" rx="6" ry="10" fill="#4499ff" id="mmarm-r" transform="rotate(15,56,62)" />
+                <circle cx="11" cy="72" r="4.5" fill="#ffe0b0" />
+                <circle cx="59" cy="72" r="4.5" fill="#ffe0b0" />
+                <ellipse cx="27" cy="88" rx="6" ry="9" fill="#4499ff" id="mmleg-l" />
+                <ellipse cx="43" cy="88" rx="6" ry="9" fill="#4499ff" id="mmleg-r" />
+                <ellipse cx="26" cy="95" rx="7" ry="4" fill="#333" />
+                <ellipse cx="44" cy="95" rx="7" ry="4" fill="#333" />
+                <circle cx="35" cy="30" r="18" fill="#ffe0b0" id="mmface" />
+                <circle cx="24" cy="34" r="4" fill="#ffb8b8" opacity="0.6" />
+                <circle cx="46" cy="34" r="4" fill="#ffb8b8" opacity="0.6" />
+                <ellipse cx="28" cy="29" rx="3.5" ry="4" fill="white" />
+                <ellipse cx="42" cy="29" rx="3.5" ry="4" fill="white" />
+                <circle cx="29" cy="30" r="2" fill="#333" />
+                <circle cx="43" cy="30" r="2" fill="#333" />
+                <circle cx="30" cy="29" r="0.7" fill="white" />
+                <circle cx="44" cy="29" r="0.7" fill="white" />
+                <path d="M29 37 Q35 42 41 37" stroke="#c07050" stroke-width="1.8" fill="none" stroke-linecap="round"
+                  id="mmm" />
+                <ellipse cx="35" cy="16" rx="18" ry="10" fill="#5533cc" id="mmh" />
+                <ellipse cx="35" cy="20" rx="18" ry="8" fill="#5533cc" id="mmh2" />
+              </svg>
+            </div>
+            <div class="cy-pname" id="sbname">닉네임</div>
+            <div class="cy-pid" id="sbid">@아이디</div>
+            <div id="ddaybox" class="ddaybox" style="display:none">
+              <div class="ddaylabel">💕 우리 만난지</div>
+              <div class="ddaynum" id="ddaynum">D+0</div>
+            </div>
+            <ul class="lnav">
+              <li><a id="nav-home" class="on" onclick="showSec('home')">🏠 홈</a></li>
+              <li><a id="nav-diary" onclick="showSec('diary')">📓 다이어리</a></li>
+              <li><a id="nav-photos" onclick="showSec('photos')">📷 사진첩</a></li>
+              <li><a id="nav-gb" onclick="showSec('gb')">📝 방명록</a></li>
+              <li><a id="nav-friends" onclick="showSec('friends')">👥 일촌</a></li>
+            </ul>
+            <div class="bgmmini" onclick="toggleBgm()">♪ BGM</div>
+            <div class="lbtns">
+              <button id="btnfriend" class="btn sm" style="display:none" onclick="showSec('friends')">💌 일촌신청</button>
+              <button id="btnedit" class="btn sm" style="display:none" onclick="showSec('edit')">✏️ 꾸미기</button>
+              <button id="btnlogout" class="btn btn-red sm" style="display:none" onclick="doLogout()">🚪 로그아웃</button>
+            </div>
+          </div>
+          <div class="cy-right" id="hright"></div>
         </div>
-        <ul class="lnav">
-          <li><a id="nav-home" class="on" onclick="showSec('home')">🏠 홈</a></li>
-          <li><a id="nav-diary" onclick="showSec('diary')">📓 다이어리</a></li>
-          <li><a id="nav-photos" onclick="showSec('photos')">📷 사진첩</a></li>
-          <li><a id="nav-gb" onclick="showSec('gb')">📝 방명록</a></li>
-          <li><a id="nav-friends" onclick="showSec('friends')">👥 일촌</a></li>
-        </ul>
-        <div class="bgmmini" onclick="toggleBgm()">♪ BGM</div>
-        <div class="lbtns">
-          <button id="btnfriend" class="btn sm" style="display:none" onclick="showSec('friends')">💌 일촌신청</button>
-          <button id="btnedit" class="btn sm" style="display:none" onclick="showSec('edit')">✏️ 꾸미기</button>
-          <button id="btnlogout" class="btn btn-red sm" style="display:none" onclick="doLogout()">🚪 로그아웃</button>
+        <div id="search-page"
+          style="display:none;position:absolute;inset:0;background:white;z-index:10;overflow-y:auto;">
+          <div class="swrap">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <button class="btn sm" onclick="closeSearch()">← 뒤로</button>
+              <span style="font-size:13px;font-weight:bold;color:#1144aa;">🔍 친구 찾기</span>
+            </div>
+            <div class="srow">
+              <input id="sq" placeholder="아이디 또는 닉네임 검색" onkeydown="if(event.key==='Enter')doSearch()">
+              <button class="btn btn-blue" onclick="doSearch()">검색</button>
+            </div>
+            <div id="sresults"></div>
+          </div>
         </div>
-      </div>
-      <div class="cy-right" id="hright"></div>
-    </div>
-    <div id="search-page" style="display:none;position:absolute;inset:0;background:white;z-index:10;overflow-y:auto;">
-      <div class="swrap">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-          <button class="btn sm" onclick="closeSearch()">← 뒤로</button>
-          <span style="font-size:13px;font-weight:bold;color:#1144aa;">🔍 친구 찾기</span>
-        </div>
-        <div class="srow">
-          <input id="sq" placeholder="아이디 또는 닉네임 검색" onkeydown="if(event.key==='Enter')doSearch()">
-          <button class="btn btn-blue" onclick="doSearch()">검색</button>
-        </div>
-        <div id="sresults"></div>
       </div>
     </div>
   </div>
