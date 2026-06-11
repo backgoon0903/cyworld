@@ -177,32 +177,23 @@
       overflow-y: auto;
     }
 
+    .cy-notebook {
+      background: transparent;
+      border-radius: 14px;
+      padding: 0;
+      box-shadow: none;
+    }
+
     .cy-page.active {
       display: flex;
     }
 
     .cy-page::before {
-      content: '';
-      position: absolute;
-      top: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 36px;
-      height: 12px;
-      background: #4db8e8;
-      border-radius: 0 0 8px 8px;
+      display: none;
     }
 
     .cy-page::after {
-      content: '';
-      position: absolute;
-      bottom: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 36px;
-      height: 12px;
-      background: #4db8e8;
-      border-radius: 8px 8px 0 0;
+      display: none;
     }
 
     .cy-logo-txt {
